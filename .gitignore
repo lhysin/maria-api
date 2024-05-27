@@ -47,3 +47,4 @@ gradle.properties
 
 node_modules
 .serverless
+application-local.yml

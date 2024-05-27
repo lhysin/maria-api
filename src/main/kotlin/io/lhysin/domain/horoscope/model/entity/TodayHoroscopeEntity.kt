@@ -2,13 +2,12 @@ package io.lhysin.domain.horoscope.model.entity
 
 import io.lhysin.domain.horoscope.model.type.ZodiacSign
 import jakarta.persistence.*
-import org.hibernate.annotations.Comment
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Entity(name = "오늘의 운세")
-@Table(name = "TODAY_HOROSOCPE")
+@Entity
+@Table(name = "today_horoscope")
 class TodayHoroscopeEntity (
 
     @Id
@@ -17,26 +16,21 @@ class TodayHoroscopeEntity (
     var id: Long? = null,
 
     @Column(nullable = false)
-    @Comment("오늘")
-    val today: LocalDate,
+    var today: LocalDate,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Comment("별자리")
-    val zodiacSign: ZodiacSign,
+    var zodiacSign: ZodiacSign,
 
     @Column(nullable = false)
-    @Comment("gpt-model")
-    val model: String,
+    var model: String,
 
     @Column(nullable = false)
-    @Comment("gpt-provider")
-    val provider: String,
+    var provider: String,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    @Comment("gpt-message")
     @Lob
-    val message: String,
+    var message: String,
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
