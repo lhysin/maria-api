@@ -11,9 +11,11 @@ import io.lhysin.external.model.request.Gpt4FreeMessage
 import io.lhysin.external.model.request.Gpt4FreeRequest
 import jakarta.validation.Valid
 import mu.KotlinLogging
+import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -132,16 +134,21 @@ class HoroscopeService(
         )
     }
 
-    fun todayHoroscope(@Valid todayHoroscopeRequest: TodayHoroscopeRequest): TodayHoroscopeResponse {
-        val todayHoroscopeDto = this.createTodayHoroscope(
-            ZodiacSign.getZodiacSign(todayHoroscopeRequest.birthDay),
-            LocalDate.now()
-        )
+    fun findTodayHoroscope(@Valid todayHoroscopeRequest: TodayHoroscopeRequest): TodayHoroscopeResponse {
 
+        // 요청으로부터 현재 날짜와 별자리 정보 가져오기
+        val today = LocalDate.now()
+        val zodiacSign = ZodiacSign.getZodiacSign(todayHoroscopeRequest.birthDay)
+
+        // 조건에 맞는 랜덤한 엔티티 조회
+        val entity = todayHoroscopeRepository.findRandomByTodayAndZodiacSign(today, zodiacSign)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found.")
+
+        // 결과를 DTO 변환하여 반환
         return TodayHoroscopeResponse(
             birthDay = todayHoroscopeRequest.birthDay,
-            zodiacSignKoreanName = todayHoroscopeDto.zodiacSign.koreanName,
-            message = todayHoroscopeDto.message,
+            zodiacSignKoreanName = entity.zodiacSign.koreanName,
+            message = entity.message
         )
     }
 }

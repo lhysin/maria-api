@@ -21,8 +21,8 @@ class HoroscopeController (
 
     @Operation(summary = "Today horoscope", description = "find Today horoscope.")
     @GetMapping
-    fun todayHoroscope(@Valid todayHoroscopeRequest: TodayHoroscopeRequest) : TodayHoroscopeResponse {
-        return horoscopeService.todayHoroscope(todayHoroscopeRequest)
+    fun findTodayHoroscope(@Valid todayHoroscopeRequest: TodayHoroscopeRequest) : TodayHoroscopeResponse {
+        return horoscopeService.findTodayHoroscope(todayHoroscopeRequest)
     }
 
     @AdminRole
