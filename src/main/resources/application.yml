@@ -1,0 +1,121 @@
+server:
+  port: 7880
+
+spring:
+  jpa:
+    database: mysql
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - health
+          - metrics
+          - prometheus
+          - env
+          - httptrace
+
+springdoc:
+  packages-to-scan:
+    - io.lhysin
+  swagger-ui:
+    groups-order: DESC
+    doc-expansion: none
+    tags-sorter: alpha
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+
+external:
+  jsonplaceholder:
+    domain: https://jsonplaceholder.typicode.com
+
+  # https://github.com/xtekky/gpt4free?tab=readme-ov-file#interference-api
+  gpt-4-free:
+    domain:
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:db1;MODE=MySql;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create
+
+logging:
+  level:
+    org.springframework.data: debug
+    org.springframework.jdbc.core: debug
+    h2: debug
+    io.lhysin: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
+maria-api:
+  secret: gHYY1jpNd4vcDQnZG69SxURt+pNkQ1sfw0tAU/BnVWI=
+
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    url: jdbc:h2:mem:db1;MODE=MySql;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create
+
+logging:
+  level:
+    org.springframework.data: debug
+    org.springframework.jdbc.core: debug
+    h2: debug
+    io.lhysin: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
+maria-api:
+  secret: cY6CNWH8qkzq1oULxQwezFNh9j/F+61EpJp7eynMqGw=
+
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- use Spring default values -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <springProfile name="development">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>${loki.push-server}</url>
+            </http>
+            <format>
+                <label>
+                    <pattern>app=maria-api,host=${HOSTNAME},level=%level,profile=${spring.profiles.active}</pattern>
+                </label>
+                <message>
+                    <pattern>${FILE_LOG_PATTERN}</pattern>
+                </message>
+                <sortByTime>true</sortByTime>
+            </format>
+        </appender>
+        <root level="DEBUG">
+            <appender-ref ref="LOKI" />
+        </root>
+    </springProfile>
+
+</configuration>
