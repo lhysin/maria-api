@@ -78,5 +78,6 @@ jobs:
             -e SPRING_PROFILES_ACTIVE=production \
             -e external.gpt-4-free.domain=${{ secrets.MARIA_API_EXTERNAL_GPT_4_FREE_DOMAIN }} \
             -e maria-api.secret=${{ secrets.MARIA_API_PRODUCTION_SECRET }} \
+            --restart=always
             ${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
             curl -X DELETE -u "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" https://index.docker.io/v1/repositories/${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}
