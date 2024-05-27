@@ -1,8 +1,8 @@
 package io.lhysin.domain.horoscope.service
 
+import io.lhysin.domain.gpt.service.GptModelProviderService
 import io.lhysin.domain.horoscope.model.entity.TodayHoroscopeEntity
 import io.lhysin.domain.horoscope.model.request.TodayHoroscopeRequest
-import io.lhysin.domain.horoscope.model.response.TodayHoroscopeDto
 import io.lhysin.domain.horoscope.model.response.TodayHoroscopeResponse
 import io.lhysin.domain.horoscope.model.type.ZodiacSign
 import io.lhysin.domain.horoscope.repository.TodayHoroscopeRepository
@@ -25,6 +25,7 @@ private val logger = KotlinLogging.logger {}
 @Service
 class HoroscopeService(
     private val gpt4FreeClient: Gpt4FreeClient,
+    private val gptModelProviderService: GptModelProviderService,
     private val todayHoroscopeRepository: TodayHoroscopeRepository,
 ) {
 
@@ -37,18 +38,7 @@ class HoroscopeService(
             val today = now.plusDays(day)
             for (zodiacSign in ZodiacSign.values()) {
                 try {
-                    val dto = createTodayHoroscope(zodiacSign, today)
-                    if (dto.message.isNotBlank()) {
-                        todayHoroscopeRepository.save(
-                            TodayHoroscopeEntity(
-                                model = dto.model,
-                                provider = dto.provider,
-                                today = today,
-                                zodiacSign = dto.zodiacSign,
-                                message = dto.message
-                            )
-                        )
-                    }
+                    createTodayHoroscope(zodiacSign, today)
                 } catch (e: Exception) {
                     logger.error{"fail createTodayHoroscope(zodiacSign, today)"}
                 }
@@ -61,13 +51,13 @@ class HoroscopeService(
         }
     }
 
-    private fun createTodayHoroscope(zodiacSign: ZodiacSign, now: LocalDate): TodayHoroscopeDto {
+    private fun createTodayHoroscope(zodiacSign: ZodiacSign, now: LocalDate) {
 
         val response = gpt4FreeClient.completions(
             Gpt4FreeRequest(
                 model = "",
                 provider = "",
-                max_tokens = 500,
+                max_tokens = 700,
                 temperature = 0.9,
                 top_p = 0.9,
                 messages = listOf(
@@ -104,15 +94,18 @@ class HoroscopeService(
             )
         )
 
-        logger.debug { "model : ${response.model}" }
-        logger.debug { "provider : ${response.provider}" }
+        if (response.message.isNotBlank() && response.model.isNotBlank() && response.provider.isNotBlank()) {
+            val gptModelProvider = gptModelProviderService.findOrCreateGptModelProvider(response.model, response.provider)
+            todayHoroscopeRepository.save(
+                TodayHoroscopeEntity(
+                    today = now,
+                    zodiacSign = zodiacSign,
+                    gptModelProvider = gptModelProvider,
+                    message = response.message
+                )
+            )
+        }
 
-        return TodayHoroscopeDto(
-            model = response.model,
-            provider = response.provider,
-            zodiacSign = zodiacSign,
-            message = response.message,
-        )
     }
 
     fun findTodayHoroscope(@Valid todayHoroscopeRequest: TodayHoroscopeRequest): TodayHoroscopeResponse {
