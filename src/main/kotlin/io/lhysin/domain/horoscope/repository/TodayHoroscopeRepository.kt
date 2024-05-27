@@ -11,6 +11,6 @@ import java.time.LocalDate
 @Repository
 interface TodayHoroscopeRepository : JpaRepository<TodayHoroscopeEntity, Long> {
 
-    @Query("SELECT t FROM TODAY_HOROSOCPE t WHERE t.today = :today AND t.zodiacSign = :zodiacSign ORDER BY RANDOM() LIMIT 1")
+    @Query("SELECT t FROM today_horosocpe t WHERE t.today = :today AND t.zodiacSign = :zodiacSign ORDER BY RANDOM() LIMIT 1")
     fun findRandomByTodayAndZodiacSign(@Param("today") today: LocalDate, @Param("zodiacSign") zodiacSign: ZodiacSign): TodayHoroscopeEntity?
 }

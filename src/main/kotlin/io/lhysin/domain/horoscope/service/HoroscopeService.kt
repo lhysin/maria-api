@@ -61,25 +61,6 @@ class HoroscopeService(
         }
     }
 
-    private fun getFutureDatesOfMonth(today: LocalDate): List<LocalDate> {
-        val year = today.year
-        val month = today.monthValue
-
-        // 현재 월의 마지막 날짜
-        val lastDayOfMonth = LocalDate.of(year, month, today.lengthOfMonth())
-
-        // 현재일자부터 해당 월의 마지막 날까지의 리스트 생성
-        val futureDatesOfMonth = mutableListOf<LocalDate>()
-        var currentDate = today
-        while (currentDate.isBefore(lastDayOfMonth) || currentDate.isEqual(lastDayOfMonth)) {
-            futureDatesOfMonth.add(currentDate)
-            currentDate = currentDate.plusDays(1)
-        }
-
-        return futureDatesOfMonth
-
-    }
-
     private fun createTodayHoroscope(zodiacSign: ZodiacSign, now: LocalDate): TodayHoroscopeDto {
 
         val response = gpt4FreeClient.completions(
