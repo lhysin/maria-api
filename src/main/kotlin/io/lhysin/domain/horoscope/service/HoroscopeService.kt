@@ -42,7 +42,7 @@ class HoroscopeService(
                 } catch (e: Exception) {
                     logger.error{"fail createTodayHoroscope(zodiacSign, today)"}
                 }
-                Thread.sleep(1000 * 7)
+                Thread.sleep(1000 * 30)
             }
             day++
             if (today.isAfter(lastDay)) {
@@ -55,7 +55,7 @@ class HoroscopeService(
 
         val response = gpt4FreeClient.completions(
             Gpt4FreeRequest(
-                model = "gpt-3.5-turbo",
+                model = "",
                 provider = "",
                 max_tokens = 700,
                 temperature = 0.9,
