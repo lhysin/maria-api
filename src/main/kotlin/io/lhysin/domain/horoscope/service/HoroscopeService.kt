@@ -55,7 +55,7 @@ class HoroscopeService(
 
         val response = gpt4FreeClient.completions(
             Gpt4FreeRequest(
-                model = "",
+                model = "gpt-3.5-turbo",
                 provider = "",
                 max_tokens = 700,
                 temperature = 0.9,
