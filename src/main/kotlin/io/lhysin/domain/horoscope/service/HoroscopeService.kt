@@ -1,5 +1,6 @@
 package io.lhysin.domain.horoscope.service
 
+import io.lhysin.domain.gpt.model.type.GptModel
 import io.lhysin.domain.gpt.service.GptModelProviderService
 import io.lhysin.domain.horoscope.model.entity.TodayHoroscopeEntity
 import io.lhysin.domain.horoscope.model.request.TodayHoroscopeRequest
@@ -32,7 +33,7 @@ class HoroscopeService(
     @Async
     fun createBulkTodayHoroscope() {
         val now = LocalDate.now()
-        val lastDay = YearMonth.of(now.year, 12).atEndOfMonth()
+        val lastDay = YearMonth.of(now.year, 12).atEndOfMonth().plusYears(1)
         var day = 0L
         while (true) {
             val today = now.plusDays(day)
@@ -55,7 +56,7 @@ class HoroscopeService(
 
         val response = gpt4FreeClient.completions(
             Gpt4FreeRequest(
-                model = "gpt-3.5-turbo",
+                model = GptModel.GPT_35_TURBO_0613.modelName,
                 provider = "",
                 max_tokens = 500,
                 temperature = 0.9,
@@ -78,12 +79,12 @@ class HoroscopeService(
 
                     Gpt4FreeMessage(
                         role = "user",
-                        content = "저의 별자리는 ${zodiacSign.koreanName} 입니다. 현재 시각은 ${now} 입니다. 이 정보를 참조해서 운세에 관해 답변해주세요",
+                        content = "저의 별자리는 ${zodiacSign.koreanName} 입니다. 현재 시각은 $now 입니다. 이 정보를 참조해서 운세에 관해 답변해주세요",
                     ),
 
                     Gpt4FreeMessage(
                         role = "assistant",
-                        content = "당신의 별자리는 ${zodiacSign.koreanName}, 현재 시간은 ${now}인것을 확인했습니다.",
+                        content = "당신의 별자리는 ${zodiacSign.koreanName}, 현재 시간은 $now 인것을 확인했습니다.",
                     ),
 
                     Gpt4FreeMessage(
@@ -94,7 +95,7 @@ class HoroscopeService(
             )
         )
 
-        if (response.message.isNotBlank() && response.model.isNotBlank() && response.provider.isNotBlank()) {
+        if (response.message.isNotBlank() && response.model.isNotBlank() && response.provider.isNotBlank() && !containsChineseCharacters(response.message)) {
             val gptModelProvider = gptModelProviderService.findOrCreateGptModelProvider(response.model, response.provider)
             todayHoroscopeRepository.save(
                 TodayHoroscopeEntity(
@@ -124,5 +125,10 @@ class HoroscopeService(
             zodiacSignKoreanName = entity.zodiacSign.koreanName,
             message = entity.message
         )
+    }
+
+    private fun containsChineseCharacters(message: String): Boolean {
+        val chineseCharacterPattern = Regex("[一-龥]")
+        return chineseCharacterPattern.containsMatchIn(message)
     }
 }
